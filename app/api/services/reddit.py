@@ -8,7 +8,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from ..core.config import get_settings
 from ..models.categories import CATEGORIES
 
-# Configure logging
+
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
@@ -52,7 +52,6 @@ async def fetch_subreddit_posts(
                 if not (url.endswith(".gif") or url.endswith(".gifv")):
                     continue
 
-                # Convert gifv to gif format
                 url = url.replace(".gifv", ".gif")
                 
                 gifs.append({
@@ -89,23 +88,19 @@ async def get_reddit_gifs(
         reddit = await init_reddit()
         subreddit_names = get_category_subreddits(category)
         
-        # Create tasks for parallel fetching
         tasks = [
             fetch_subreddit_posts(reddit, subreddit, min(limit * 2, 50))
             for subreddit in subreddit_names
         ]
         
-        # Gather results with timeout
         async with asyncio.timeout(settings.REQUEST_TIMEOUT):
             results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        # Process results
         all_gifs = []
         for result in results:
             if isinstance(result, list):
                 all_gifs.extend(result)
         
-        # Handle pagination and randomization
         if all_gifs:
             random.shuffle(all_gifs)
             if offset >= len(all_gifs):

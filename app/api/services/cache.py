@@ -58,7 +58,6 @@ async def cache_set(key: str, value: Any, ex: int = 3600) -> bool:
     
     try:
         value_str = json.dumps(value)
-        # Set with expiration using SETEX command
         result = await redis._make_request(["SETEX", key, str(ex), value_str])
         return result == "OK"
     except Exception as e:
