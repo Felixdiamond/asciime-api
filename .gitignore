@@ -1,0 +1,5 @@
+sandbox/
+app/.env
+**/__pycache__/
+gitignore
+.env
